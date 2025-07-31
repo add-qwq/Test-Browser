@@ -7,7 +7,7 @@
 
 A lightweight browser compatibility detection tool that checks for modern web features support, handles unsupported browsers, and logs compatibility issues. It ensures web applications run smoothly by guiding users with incompatible browsers to upgrade.
 
-![GitHub license](https://img.shields.io/github/license/example/Test-Browser?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/add-qwq/Test-Browser?style=flat-square)
 
 This tool automatically detects browser support for essential web features, distinguishes between mobile and desktop devices, and redirects users with unsupported browsers to appropriate upgrade pages. It also tracks upgrade prompts using localStorage and logs compatibility data to a server endpoint.
 
@@ -116,7 +116,7 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 
 一个轻量级浏览器兼容性检测工具，用于检查现代Web特性支持情况、处理不兼容浏览器并记录兼容性问题。通过引导使用不兼容浏览器的用户进行升级，确保Web应用平稳运行。
 
-![GitHub license](https://img.shields.io/github/license/example/Test-Browser?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/add-qwq/Test-Browser?style=flat-square)
 
 该工具自动检测浏览器对核心Web特性的支持，区分移动设备和桌面设备，并将使用不支持浏览器的用户重定向到相应的升级页面。它还使用localStorage跟踪升级提示，并将兼容性数据记录到服务器端点。
 
