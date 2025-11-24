@@ -13,24 +13,30 @@ This tool automatically detects browser support for essential web features, dist
 
 ### Key Features
 
-- **Modern Browser Detection**: Validates support for core modern web features
+- **Dual-layer Browser Detection**: Validates support for core modern web features and auxiliary browser capabilities
 - **Device Type Recognition**: Identifies mobile and desktop devices via user-agent
-- **Unsupported Handling Handling**: Automatically redirects to device-specific upgrade pages
-- **Prompt Prompt Tracking Prompt Tracking Prompt Tracking**: Uses localStorage to track upgrade prompts (30-day expiration)
-- **Compatibility Logging**: Sends detailed compatibility data to a server-side handler
+- **Unsupported Handling**: Automatically redirects to device-specific upgrade pages
+- **Prompt Tracking**: Uses localStorage to track upgrade prompts (30-day expiration)
+- **Compatibility Logging**: Sends detailed compatibility data to a server endpoint
 - **Automatic Initialization**: Runs detection on DOM content loaded (skips localhost)
-- **Detailed Dependency-free**: Lightweight implementation with no external dependencies
+- **Dependency-free**: Lightweight implementation with no external dependencies
 
 ### Detected Features
 
-Test-Browser checks for support for the following critical features:
+Test-Browser performs a dual-layer check for browser compatibility:
 
+#### Core API Checks
+- Proxy API
+- Array.prototype.findLast
+- CSS contentVisibility property
+
+#### Auxiliary Feature Checks
 - **Core APIs**: fetch, Promise, URLSearchParams, JSON (parse/stringify)
 - **DOM Features**: classList, getBoundingClientRect, dispatchEvent, closest, addEventListener
 - **Storage Capabilities**: localStorage, sessionStorage, cookie manipulation, SameSite cookie support
 - **Data Handling**: FormData (creation and manipulation)
 - **Clipboard Access**: ClipboardItem, execCommand('copy'), navigator.clipboard
-- **Advanced APIs**: IntersectionObserver, AbortController, XMLHttpRequest
+- **Advanced APIs**: IntersectionObserver, AbortController, XMLHttpRequest, requestAnimationFrame
 - **Network**: fetch functionality with URLSearchParams
 - **CSS**: backdrop-filter (including -webkit prefix), gradient support
 
@@ -51,23 +57,21 @@ Test-Browser checks for support for the following critical features:
 
 ##### Manual Browser Check
 ```javascript
-// Check if browser supports all modern features
-const isModern = isModernBrowser();
-console.log('Is modern browser:', isModern);
-```
+// Check if browser supports core APIs
+const isCoreSupported = checkCoreBrowserSupport();
+console.log('Core API support:', isCoreSupported);
 
-##### Get Unsupported Reasons
-```javascript
-// Get specific reasons for incompatibility
-const reasons = getUnsupportedReasons();
-console.log('Unsupported features:', reasons);
+// Check auxiliary browser features
+const { isSupported: isAuxSupported, unsupportedReasons } = checkAuxBrowserFeatures();
+console.log('Auxiliary feature support:', isAuxSupported);
+console.log('Unsupported features:', unsupportedReasons);
 ```
 
 ##### Device Type Detection
 ```javascript
 // Check if device is mobile
-const isMobile = isMobileDevice();
-console.log('Is mobile device:', isMobile);
+const deviceType = getDeviceType();
+console.log('Device type:', deviceType); // 'mobile' or 'pc'
 ```
 
 ##### Reset Upgrade Prompt
@@ -78,24 +82,34 @@ resetBrowserUpgradePrompt();
 
 ### API Reference
 
-#### isModernBrowser()
-Returns true if the browser supports all required modern features, false otherwise.
+#### checkCoreBrowserSupport()
+Checks support for essential modern web APIs (Proxy, Array.prototype.findLast, CSS contentVisibility).
+Returns true if all core APIs are supported, false otherwise.
 
-#### getUnsupportedReasons()
-Returns an array of strings describing specific features that are unsupported.
+#### checkAuxBrowserFeatures()
+Checks support for auxiliary browser features and returns an object with:
+- isSupported: Boolean indicating if all features are supported
+- unsupportedReasons: Array of strings describing unsupported features
 
-#### isMobileDevice()
-Returns true for mobile user-agents (Android, iOS, etc.), false for desktop.
+#### getDeviceType()
+Returns 'mobile' for mobile user-agents (Android, iOS, etc.), 'pc' for desktop.
 
-#### handleUnsupportedBrowser(unsupportedReasons)
+#### handleUnsupportedBrowser(coreReasons, auxReasons)
 Handles unsupported browser workflow:
 - Stores current URL in localStorage for later redirection
 - Marks upgrade prompt as shown (30-day expiration)
-- Sends compatibility data to /Test-Browser/Test-Browser-log-handler
+- Sends compatibility data to /Test-Browser/Test-Browser-log-handler.php
 - Redirects to device-specific upgrade page (/upgrade-your-browser/Update-Pe-browser.html for mobile, /upgrade-your-browser/Update-Pc-browser.html for desktop)
 
 #### resetBrowserUpgradePrompt()
 Clears upgrade prompt tracking from localStorage and redirects to the originally stored URL (or homepage).
+
+#### checkPromptStatus()
+Checks if the user has been prompted before and if the prompt has expired.
+Returns an object with hasBeenPrompted and isExpired properties.
+
+#### reportUnsupportedLog(allReasons, deviceType)
+Sends detailed compatibility data to the server log handler as a JSON payload.
 
 #### Server-side Log Handler
 Test-Browser-log-handler.php receives POST requests with compatibility data and appends formatted logs to /Test-Browser/Test-Browser.log. It validates request methods and required fields before logging.
@@ -122,7 +136,7 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 
 ### 核心功能
 
-- **现代浏览器检测**：验证核心现代Web特性的支持情况
+- **双层浏览器检测**：验证核心现代Web特性和辅助浏览器功能的支持情况
 - **设备类型识别**：通过用户代理识别移动设备和桌面设备
 - **不兼容处理**：自动重定向到设备专用升级页面
 - **升级提示跟踪**：使用localStorage跟踪升级提示（30天有效期）
@@ -132,14 +146,20 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 
 ### 检测的特性
 
-Test-Browser检查以下关键特性的支持情况：
+Test-Browser执行双层浏览器兼容性检查：
 
+#### 核心API检查
+- Proxy API
+- Array.prototype.findLast
+- CSS contentVisibility属性
+
+#### 辅助特性检查
 - **核心API**：fetch、Promise、URLSearchParams、JSON（parse/stringify）
 - **DOM特性**：classList、getBoundingClientRect、dispatchEvent、closest、addEventListener
 - **存储能力**：localStorage、sessionStorage、Cookie操作、SameSite cookie支持
 - **数据处理**：FormData（创建和操作）
 - **剪贴板访问**：ClipboardItem、execCommand('copy')、navigator.clipboard
-- **高级API**：IntersectionObserver、AbortController、XMLHttpRequest
+- **高级API**：IntersectionObserver、AbortController、XMLHttpRequest、requestAnimationFrame
 - **网络**：带URLSearchParams的fetch功能
 - **CSS**：backdrop-filter（包括-webkit前缀）、渐变支持
 
@@ -160,23 +180,21 @@ Test-Browser检查以下关键特性的支持情况：
 
 ##### 手动浏览器检查
 ```javascript
-// 检查浏览器是否支持所有现代特性
-const isModern = isModernBrowser();
-console.log('是否为现代浏览器:', isModern);
-```
+// 检查浏览器是否支持核心API
+const isCoreSupported = checkCoreBrowserSupport();
+console.log('核心API支持情况:', isCoreSupported);
 
-##### 获取不支持的原因
-```javascript
-// 获取不兼容的具体原因
-const reasons = getUnsupportedReasons();
-console.log('不支持的特性:', reasons);
+// 检查辅助浏览器功能
+const { isSupported: isAuxSupported, unsupportedReasons } = checkAuxBrowserFeatures();
+console.log('辅助功能支持情况:', isAuxSupported);
+console.log('不支持的功能:', unsupportedReasons);
 ```
 
 ##### 设备类型检测
 ```javascript
-// 检查设备是否为移动设备
-const isMobile = isMobileDevice();
-console.log('是否为移动设备:', isMobile);
+// 检查设备类型
+const deviceType = getDeviceType();
+console.log('设备类型:', deviceType); // 'mobile' 或 'pc'
 ```
 
 ##### 重置升级提示
@@ -187,24 +205,34 @@ resetBrowserUpgradePrompt();
 
 ### API参考
 
-#### isModernBrowser()
-如果浏览器支持所有必需的现代特性，返回true，否则返回false。
+#### checkCoreBrowserSupport()
+检查核心现代Web API（Proxy、Array.prototype.findLast、CSS contentVisibility）的支持情况。
+如果所有核心API都受支持，返回true，否则返回false。
 
-#### getUnsupportedReasons()
-返回描述不支持的具体特性的字符串数组。
+#### checkAuxBrowserFeatures()
+检查辅助浏览器功能的支持情况，并返回一个包含以下属性的对象：
+- isSupported：布尔值，表示是否支持所有功能
+- unsupportedReasons：描述不支持功能的字符串数组
 
-#### isMobileDevice()
-对于移动设备用户代理（Android、iOS等）返回true，桌面设备返回false。
+#### getDeviceType()
+对于移动设备用户代理（Android、iOS等）返回'mobile'，桌面设备返回'pc'。
 
-#### handleUnsupportedBrowser(unsupportedReasons)
+#### handleUnsupportedBrowser(coreReasons, auxReasons)
 处理不支持的浏览器流程：
 - 将当前URL存储在localStorage中以备后续重定向
 - 标记升级提示已显示（30天有效期）
-- 将兼容性数据发送到/Test-Browser/Test-Browser-log-handler
+- 将兼容性数据发送到/Test-Browser/Test-Browser-log-handler.php
 - 重定向到设备专用升级页面（移动设备为/upgrade-your-browser/Update-Pe-browser.html，桌面设备为/upgrade-your-browser/Update-Pc-browser.html）
 
 #### resetBrowserUpgradePrompt()
 清除localStorage中的升级提示跟踪，并将重定向到原始存储的URL（或首页）。
+
+#### checkPromptStatus()
+检查用户之前是否已收到提示以及提示是否已过期。
+返回一个包含hasBeenPrompted和isExpired属性的对象。
+
+#### reportUnsupportedLog(allReasons, deviceType)
+将详细的兼容性数据作为JSON负载发送到服务器日志处理程序。
 
 #### 服务器端日志处理程序
 Test-Browser-log-handler.php接收包含兼容性数据的POST请求，并将格式化的日志追加到/Test-Browser/Test-Browser.log。它在记录前验证请求方法和必需字段。
